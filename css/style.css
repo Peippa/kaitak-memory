@@ -1,0 +1,324 @@
+/* ============================================================
+   啟德記憶 Kai Tak Memory — 樣式
+   設計參照：1960–70 年代國泰/遠東航空旅遊海報（米白×朱紅×海港青）
+   及啟德機場格仔山標誌母題。無外置字體，使用系統繁中字體。
+   ============================================================ */
+:root {
+  --ink: #1b2a3a;
+  --ink-soft: #3d4f63;
+  --paper: #f5efe3;
+  --paper-2: #efe6d3;
+  --red: #c8452c;
+  --teal: #0e5f6b;
+  --gold: #d9a441;
+  --shadow: 0 10px 30px rgba(27, 42, 58, .25);
+  --serif: "Songti TC", "Noto Serif TC", "PMingLiU", serif;
+  --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  overflow: hidden;
+}
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+/* ---------- 頂欄 ---------- */
+header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 18px;
+  background: linear-gradient(90deg, var(--ink) 0%, #243b52 60%, var(--teal) 100%);
+  color: var(--paper);
+  flex: 0 0 auto;
+  z-index: 1200;
+}
+header .logo {
+  width: 34px; height: 34px; flex: 0 0 auto;
+  border: 3px solid var(--paper);
+  display: grid; place-items: center;
+  background:
+    repeating-conic-gradient(var(--red) 0% 25%, var(--paper) 0% 50%) 0 0 / 16px 16px;
+  border-radius: 4px;
+}
+header h1 {
+  font-family: var(--serif);
+  font-size: 20px; letter-spacing: 2px; white-space: nowrap;
+}
+header h1 { min-width: 0; overflow: hidden; }
+header h1 small { font-size: 11px; letter-spacing: 1px; opacity: .75; font-family: var(--sans); display: block; overflow: hidden; text-overflow: ellipsis; }
+header .spacer { flex: 1; }
+.btn {
+  border: none; cursor: pointer; font-family: var(--sans);
+  background: var(--red); color: #fff;
+  padding: 8px 16px; border-radius: 3px; font-size: 14px; letter-spacing: 1px;
+  transition: filter .15s;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn.ghost { background: transparent; border: 1px solid var(--ink-soft); color: var(--ink); }
+.btn.danger { background: #8c2f1b; }
+.btn.small { padding: 4px 10px; font-size: 12px; }
+
+/* ---------- 主區 ---------- */
+#main { flex: 1 1 auto; display: flex; position: relative; min-height: 0; }
+
+/* 側欄 */
+#sidebar {
+  width: 320px; flex: 0 0 auto;
+  background: var(--paper);
+  border-right: 1px solid #d8ccb4;
+  overflow-y: auto;
+  transition: margin .25s;
+  z-index: 1100;
+}
+#sidebar.fold { margin-left: -320px; }
+#sidebarToggle {
+  position: absolute; left: 320px; top: 12px; z-index: 1150;
+  width: 26px; height: 44px; border: 1px solid #d8ccb4; border-left: none;
+  background: var(--paper); cursor: pointer; border-radius: 0 5px 5px 0;
+  color: var(--ink-soft); transition: left .25s;
+}
+#sidebar.fold ~ #sidebarToggle, #sidebar.fold + #sidebarToggle { left: 0; }
+.side-sec { padding: 14px 16px; border-bottom: 1px solid #e0d5bd; }
+.side-sec h3 {
+  font-family: var(--serif); font-size: 14px; letter-spacing: 2px;
+  color: var(--teal); margin-bottom: 10px;
+}
+.side-sec h3::before { content: "▍"; color: var(--red); }
+
+/* 年代按鈕 */
+.era-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.era-btn {
+  text-align: left; padding: 7px 9px; cursor: pointer;
+  border: 1px solid #cfc2a6; background: #fbf7ee; border-radius: 3px;
+  font-family: var(--sans); color: var(--ink); transition: all .15s;
+}
+.era-btn b { display: block; font-size: 12px; }
+.era-btn small { font-size: 10px; color: var(--ink-soft); }
+.era-btn:hover { border-color: var(--teal); }
+.era-btn.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+.era-btn.on small { color: #cfe6e9; }
+/* 年代數目為單數時，最後一個按鈕佔滿整行 */
+.era-btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.era-note {
+  margin-top: 8px; padding: 2px 0 2px 9px; border-left: 3px solid var(--gold);
+  font-size: 12px; line-height: 1.75; color: var(--ink-soft); text-align: justify;
+}
+.era-note:empty { display: none; }
+
+/* 類型 chips */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.type-chip {
+  border: 1px solid #cfc2a6; background: #fbf7ee; border-radius: 20px;
+  padding: 4px 12px; font-size: 12px; cursor: pointer; color: var(--ink);
+}
+.type-chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* 搜尋 */
+#search {
+  width: 100%; padding: 8px 12px; border: 1px solid #cfc2a6; border-radius: 3px;
+  background: #fbf7ee; font-size: 14px; font-family: var(--sans); color: var(--ink);
+}
+#search:focus { outline: 2px solid var(--teal); }
+
+/* 底圖選擇 */
+.radio-row { display: flex; gap: 12px; font-size: 13px; flex-wrap: wrap; }
+.radio-row label { display: flex; gap: 4px; align-items: center; cursor: pointer; }
+
+/* 透明度 */
+#opacity { width: 100%; accent-color: var(--red); }
+#histLabel { font-size: 12px; color: var(--ink-soft); display: block; margin-bottom: 4px; }
+
+/* 地點列表 */
+#poiList { display: flex; flex-direction: column; gap: 4px; }
+.poi-item {
+  display: flex; gap: 10px; align-items: center; text-align: left;
+  padding: 8px; border: none; background: transparent; cursor: pointer;
+  border-radius: 3px; font-family: var(--sans); color: var(--ink);
+}
+.poi-item:hover { background: var(--paper-2); }
+.poi-item .dot {
+  width: 26px; height: 26px; flex: 0 0 auto; border-radius: 50%;
+  color: #fff; display: grid; place-items: center; font-size: 13px;
+}
+.poi-item .nm { font-size: 13px; line-height: 1.35; }
+.poi-item .nm small { display: block; color: var(--ink-soft); font-size: 11px; }
+.empty { font-size: 12px; color: var(--ink-soft); padding: 8px 0; }
+
+/* 地圖 */
+#map { flex: 1 1 auto; background: #0c1620; }
+.leaflet-container { font-family: var(--sans); }
+
+/* 標記 */
+.poi-wrap { background: none; border: none; }
+.poi-marker {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--paper);
+  border: 3px solid var(--mc, var(--red));
+  display: grid; place-items: center;
+  font-size: 13px; color: var(--mc, var(--red)); font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  position: relative;
+}
+.ic-plus {
+  position: absolute; right: -6px; bottom: -4px;
+  background: var(--ink); color: #fff; font-size: 9px;
+  border-radius: 8px; padding: 1px 5px;
+}
+.poi-tip { font-family: var(--sans); font-size: 12px; }
+.pulse .poi-marker { animation: pulse 1.2s ease-out 3; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(200,69,44,.7); }
+  100% { box-shadow: 0 0 0 22px rgba(200,69,44,0); }
+}
+
+/* 跑道標註 */
+.runway-label {
+  background: var(--red); color: #fff; border: none;
+  font-size: 11px; letter-spacing: 2px; padding: 2px 8px; font-weight: 700;
+}
+.cb-label {
+  background: var(--ink); color: var(--gold); border: none;
+  font-size: 10px; letter-spacing: 1px; padding: 2px 6px;
+}
+.approach-line { animation: dash 30s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -480; } }
+
+/* 詳情抽屜 */
+/* 用 transform 收起：無論抽屜多闊都能完全移出畫面（舊寫法在 461–860px 寬會殘留一截） */
+#drawer {
+  position: absolute; top: 0; right: 0; width: 440px; max-width: 92vw;
+  height: 100%; background: var(--paper); z-index: 1300;
+  box-shadow: -12px 0 32px rgba(27,42,58,.3);
+  transform: translateX(calc(100% + 40px)); visibility: hidden;
+  transition: transform .3s ease, visibility 0s linear .3s;
+  display: flex; flex-direction: column;
+}
+#drawer.open { transform: none; visibility: visible; transition: transform .3s ease, visibility 0s; }
+.drawer-close {
+  position: absolute; top: 10px; right: 12px; z-index: 10;
+  border: none; background: var(--ink); color: var(--paper);
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 13px;
+}
+.drawer-inner { overflow-y: auto; padding: 26px 26px 40px; }
+.d-era { color: var(--teal); font-size: 12px; letter-spacing: 2px; margin-bottom: 6px; font-weight: 700; }
+#drawer h2 { font-family: var(--serif); font-size: 22px; line-height: 1.3; margin-bottom: 4px; }
+.d-sub { color: var(--ink-soft); font-size: 12px; margin-bottom: 10px; font-style: italic; }
+.d-types { margin-bottom: 14px; }
+.tag {
+  display: inline-block; font-size: 11px; padding: 2px 10px; margin-right: 5px;
+  border: 1px solid var(--tc); color: var(--tc); border-radius: 20px;
+}
+.d-desc { font-size: 14px; line-height: 1.85; text-align: justify; margin-bottom: 14px; }
+#drawer blockquote {
+  margin: 14px 0; padding: 12px 16px;
+  border-left: 3px solid var(--gold);
+  background: var(--paper-2); font-family: var(--serif);
+}
+#drawer blockquote p { font-size: 14px; line-height: 1.8; margin-bottom: 8px; }
+#drawer blockquote footer { font-size: 12px; color: var(--ink-soft); font-family: var(--sans); }
+#drawer figure { margin: 14px 0; }
+#drawer figure img { width: 100%; border-radius: 3px; box-shadow: var(--shadow); display: block; }
+#drawer figcaption { font-size: 11px; color: var(--ink-soft); margin-top: 6px; line-height: 1.5; }
+.credit { color: var(--red); }
+.credit a { color: var(--red); text-decoration: none; border-bottom: 1px dotted var(--red); }
+.credit a:hover { text-decoration: underline; }
+.yt-frame { position: relative; padding-top: 56.25%; border-radius: 3px; overflow: hidden; box-shadow: var(--shadow); }
+.yt-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vfile { width: 100%; display: block; border-radius: 3px; box-shadow: var(--shadow); background: #000; max-height: 340px; }
+.d-sources { margin-top: 18px; border-top: 1px dashed #cfc2a6; padding-top: 12px; }
+.d-sources h4 { font-size: 13px; margin-bottom: 6px; color: var(--teal); }
+.d-sources ul { list-style: none; }
+.d-sources li { font-size: 12px; margin-bottom: 4px; }
+.d-sources a { color: var(--red); text-decoration: none; }
+.d-sources a:hover { text-decoration: underline; }
+.d-note { margin-top: 16px; font-size: 11px; color: #9a8d72; }
+
+/* 底部年表 */
+#timelineWrap {
+  flex: 0 0 auto; background: var(--ink); color: var(--paper);
+  position: relative; z-index: 1100;
+}
+#tlHead { display: flex; align-items: center; padding: 6px 18px 0; gap: 14px; }
+#tlHead .tl-title { font-family: var(--serif); letter-spacing: 3px; font-size: 13px; color: var(--gold); }
+#eraTrack { position: relative; flex: 1; height: 26px; display: flex; }
+#eraTrack .seg {
+  flex: 1; display: grid; place-items: center; font-size: 10px; letter-spacing: 1px;
+  color: #9fb2c5; border-left: 1px solid rgba(245,239,227,.15); cursor: pointer;
+}
+#eraTrack .seg:hover { color: var(--paper); background: rgba(255,255,255,.06); }
+#eraTrack .seg.on { color: var(--paper); font-weight: 700; }
+#tlCursor {
+  position: absolute; top: 0; bottom: 0; width: 3px; background: var(--red);
+  transition: left .4s; pointer-events: none;
+}
+#tlToggle {
+  border: none; background: none; color: var(--gold); cursor: pointer;
+  font-size: 11px; letter-spacing: 1px; padding: 4px 8px;
+}
+#timelineWrap.fold #timeline { display: none; }
+#timeline {
+  display: flex; gap: 10px; overflow-x: auto; padding: 10px 18px 14px;
+  scrollbar-color: var(--teal) transparent;
+}
+.tl-item {
+  flex: 0 0 auto; width: 210px; text-align: left; cursor: pointer;
+  background: rgba(245,239,227,.06); border: 1px solid rgba(245,239,227,.14);
+  border-radius: 4px; padding: 8px 10px; color: var(--paper); font-family: var(--sans);
+  transition: background .15s;
+}
+.tl-item:hover { background: rgba(245,239,227,.14); }
+.tl-item.on { border-color: var(--gold); background: rgba(217,164,65,.15); }
+.tl-year { display: block; font-family: var(--serif); font-size: 17px; color: var(--gold); }
+.tl-year small { font-size: 10px; margin-left: 5px; color: #9fb2c5; }
+.tl-text { font-size: 11px; line-height: 1.5; color: #d9e2ea; display: block; margin-top: 3px; }
+
+/* popup */
+.leaflet-popup-content-wrapper { background: var(--paper); color: var(--ink); border-radius: 5px; }
+.leaflet-popup-tip { background: var(--paper); }
+
+/* 響應式 */
+@media (max-width: 860px) {
+  #sidebar { position: absolute; left: 0; top: 0; bottom: 0; box-shadow: var(--shadow); }
+  #sidebar.fold { margin-left: -320px; }
+  #drawer { width: 100vw; max-width: 100vw; }
+  header h1 { font-size: 16px; }
+}
+
+/* ---------- v4 新增 ---------- */
+.sub-label { display: block; font-size: 12px; color: var(--ink-soft); margin: 10px 0 4px; }
+#histSelect {
+  width: 100%; padding: 6px 8px; border: 1px solid #cfc2a6; border-radius: 3px;
+  background: #fbf7ee; font-family: var(--sans); font-size: 13px; color: var(--ink);
+}
+#histSelect:focus { outline: 2px solid var(--teal); }
+#histLabel:empty { display: none; }
+
+/* 地圖來源：預設收成左下角的「ⓘ」按鈕，點開才顯示出處欄 */
+.leaflet-container .leaflet-control-attribution {
+  display: none;
+  background: rgba(245, 239, 227, .94); color: var(--ink-soft);
+  font-size: 11px; line-height: 1.5; padding: 4px 8px; border-radius: 3px;
+  margin: 0 0 6px 10px; max-width: min(520px, 75vw); box-shadow: var(--shadow);
+}
+.leaflet-container.attr-open .leaflet-control-attribution { display: block; }
+.leaflet-container .leaflet-control-attribution a { color: var(--red); }
+.attr-toggle {
+  width: 26px; height: 26px; padding: 0; border-radius: 50%;
+  border: 1px solid #cfc2a6; background: rgba(245, 239, 227, .94);
+  color: var(--ink-soft); font-size: 15px; line-height: 24px; text-align: center;
+  cursor: pointer; box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+}
+.attr-toggle:hover, .leaflet-container.attr-open .attr-toggle { color: var(--red); border-color: var(--red); }
+.attr-toggle:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .approach-line, .pulse .poi-marker { animation: none; }
+  #drawer, #sidebar, #sidebarToggle, #tlCursor { transition: none; }
+}
+
+@media (max-width: 860px) {
+  header { gap: 10px; padding: 8px 12px; }
+  header h1 small { display: none; }
+}

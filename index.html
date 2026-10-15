@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="啟德記憶 Kai Tak Memory：以歷史地圖為中心的香港公共歷史平台，收錄啟德機場 1924–1998 的大事年表、歷史照片、影像與居民記憶。">
+<title>啟德記憶 Kai Tak Memory — 地圖上的香港公共歷史</title>
+<link rel="stylesheet" href="assets/vendor/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23c8452c'/><rect x='4' y='4' width='24' height='24' fill='%23f5efe3'/><rect x='9' y='9' width='14' height='14' fill='%23c8452c'/></svg>">
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="logo" aria-hidden="true"></div>
+    <h1>啟德記憶<small>KAI TAK MEMORY · 香港歷史地圖公眾史平台（HIST5011B 習作）</small></h1>
+    <div class="spacer"></div>
+  </header>
+
+  <div id="main">
+    <aside id="sidebar">
+      <div class="side-sec">
+        <h3>年代時光機</h3>
+        <div class="era-grid" id="eraGrid"></div>
+        <p id="eraNote" class="era-note" aria-live="polite"></p>
+      </div>
+
+      <div class="side-sec">
+        <h3>資料類型</h3>
+        <div class="chip-row">
+          <button class="type-chip" data-type="event">事件</button>
+          <button class="type-chip" data-type="landmark">地標</button>
+          <button class="type-chip" data-type="photo">照片</button>
+          <button class="type-chip" data-type="video">影像</button>
+          <button class="type-chip" data-type="audio">聲音</button>
+          <button class="type-chip" data-type="memory">居民記憶</button>
+        </div>
+      </div>
+
+      <div class="side-sec">
+        <h3>搜尋</h3>
+        <input id="search" type="text" placeholder="例如：格仔山、國泰、1998……" aria-label="搜尋地點與內容（涵蓋所有年代）">
+      </div>
+
+      <div class="side-sec">
+        <h3>地圖圖層</h3>
+        <div class="radio-row">
+          <label><input type="radio" name="base" value="imagery" checked> 現代衛星</label>
+          <label><input type="radio" name="base" value="street"> 現代街道</label>
+          <label><input type="radio" name="base" value="blank"> 無底圖</label>
+        </div>
+        <label class="sub-label" for="histSelect">歷史地圖（切換年代時自動更換，也可自選）</label>
+        <select id="histSelect"></select>
+        <p style="margin-top:6px"><span id="histLabel"></span></p>
+        <input id="opacity" type="range" min="0" max="1" step="0.05" value="0.85" aria-label="歷史圖層不透明度">
+        <small>歷史圖層不透明度：<span id="opacityVal">85%</span></small>
+        <label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="toggleTraces" checked> 顯示跑道與 13 跑道進場航線（示意）
+        </label>
+      </div>
+
+      <div class="side-sec">
+        <h3>此地點</h3>
+        <div id="poiList"></div>
+      </div>
+    </aside>
+    <button id="sidebarToggle" aria-label="收起側欄">«</button>
+
+    <div id="map"></div>
+
+    <div id="drawer" role="dialog" aria-label="地點詳情"></div>
+  </div>
+
+  <div id="timelineWrap">
+    <div id="tlHead">
+      <span class="tl-title">大事年表</span>
+      <div id="eraTrack">
+        <div id="tlCursor"></div>
+      </div>
+      <button id="tlToggle">▼ 收起</button>
+    </div>
+    <div id="timeline"></div>
+  </div>
+</div>
+
+<script src="assets/vendor/leaflet.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
