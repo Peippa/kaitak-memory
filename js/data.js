@@ -1,18 +1,5 @@
-/* ============================================================
-   啟德記憶 Kai Tak Memory — 數據檔
-   資料來源：HIST5011B 課程材料《啟德機場大事年表》、《啟德資料收集(2007至今)》、
-   民航處、Gwulo、Hong Kong Maper、Our China Story、界面新聞、BBC、
-   立法會文件、星島/大公文匯報道。詳見 README.md 與「關於本站」。
-   v4：修正地圖覆蓋、座標與內容錯誤，見 CHANGELOG.md。
-   註解中標有「待核」的地方，是尚未找到可靠出處、暫未改動的內容。
-   ============================================================ */
-
 const TILE_DIR = "assets/tiles/";
 
-/* 歷史地圖圖層（瓦片已下載至本地，原始來源 hkmaps.hk，教育用途引用）
-   bounds：本地瓦片的實際覆蓋範圍 [[南, 西], [北, 東]]（按 z16 瓦片計算，1982.3 按 z15）
-   maxZoom：本地瓦片的最高縮放級，再放大時以此級別放大顯示
-   note：顯示在側欄的覆蓋說明 */
 const HISTORICAL_MAPS = {
   "1924":   { name: "1924 · 九龍及新界東部（啟德濱原海岸）", maxZoom: 17, bounds: [[22.2840, 114.1699], [22.3501, 114.2468]], src: "UK National Archives / HK Public Records Office，經 hkmaps.hk 地理配準" },
   "1947":   { name: "1947 · 九龍半島（戰後）", maxZoom: 17, bounds: [[22.2891, 114.1699], [22.3450, 114.2139]], src: "HK Public Records Office，經 hkmaps.hk" },
@@ -24,14 +11,6 @@ const HISTORICAL_MAPS = {
   "1996":   { name: "1996 · 香港及九龍測量圖（謝幕前夜）", maxZoom: 17, bounds: [[22.2840, 114.1699], [22.3501, 114.2468]], src: "Hong Kong Map Service，經 hkmaps.hk" }
 };
 
-/* 年代帶：切換年代 = 切換歷史地圖 + 聚焦視角 + 篩選標記 */
-/* 年代劃分（v4.2）
-   以有據可查的事件分界；相鄰年代共用分界年份（分界事件都在年中發生，不把整年硬分給一邊）：
-   1924 啟德營業公司清盤、土地由政府收回｜1941.12.08 日軍進攻香港｜1945.08.30 英國艦隊抵港
-   1958.09.12 新跑道啟用｜1970.04.11 波音 747 首次到港｜1989.10.11 宣布興建赤鱲角新機場｜1998.07.06 啟德關閉
-   start / end：起訖年份（end 為 null 表示「至今」）；map：預設歷史地圖；c / z：該年代沒有地點時的後備視角；
-   note：側欄顯示的年代說明。年代按鈕和時間軸刻度都由這裏自動生成，改這裏一處即可。
-   1956 圖瓦片不完整、1963 航空照片不覆蓋跑道，沒有作為預設圖，仍可在「歷史地圖」選單自選。 */
 const ERAS = [
   { id: "e1924", start: 1924, end: 1941, label: "草創與民航起步", map: "1924", c: [22.3245, 114.2045], z: 15,
     note: "1924 年啟德營業有限公司清盤，填海地由政府收回，亞拔同年在此試飛；其後皇家空軍進駐，1936 年帝國航空開辦定期航班。至 1941 年 12 月日軍進攻香港為止。" },
@@ -45,19 +24,18 @@ const ERAS = [
     note: "1970 年 4 月 11 日泛美波音 747 首次到港。1974 年起 13 跑道採用儀器導航進場，在格仔山前右轉對準跑道；1978 年皇家空軍撤離啟德。也可在「歷史地圖」選單切換 1983 年機場條例圖。" },
   { id: "e1989", start: 1989, end: 1998, label: "飽和與謝幕", map: "1996", c: [22.3180, 114.2080], z: 14,
     note: "1989 年 10 月 11 日港府宣布在赤鱲角興建新機場，超負荷運作的啟德進入倒數。1998 年 7 月 6 日凌晨啟德關閉，運作在一夜之間遷往赤鱲角。" },
-  { id: "e1998", start: 1998, end: null, label: "後機場時代", map: null, c: [22.3200, 114.2070], z: 15,
-    note: "機場關閉後，原址經歷多年規劃爭議；2007 年底《啟德分區計劃大綱圖》獲核准，2010 年成立啟德辦事處統籌發展，2013 年郵輪碼頭、2025 年體育園相繼啟用。" }
+  { id: "e1998", start: 1998, end: 2007, label: "退場與臨時城市", map: "1996", c: [22.3200, 114.2050], z: 15,
+    note: "1998 年 7 月機場關閉後，機場不是一夜消失，而是逐塊退場：北停機坪的地盤整理及土地淨化工程在 1998 年 10 月展開、2002 年 4 月完成，舊客運大樓與停車樓 2004 年 4 月起拆卸。與此同時，停車場、巴士車廠、高爾夫球場、堆料場和工地陸續進駐，到 2005 年約六成土地已短期出租或臨時撥用。至 2007 年底分區計劃大綱圖獲核准為止。地圖為 1996 年測量圖，可對照其後逐步拆去的機場設施。" },
+  { id: "e2007", start: 2007, end: null, label: "啟德重生", map: null, c: [22.3200, 114.2070], z: 15,
+    note: "2007 年底《啟德分區計劃大綱圖》獲核准，啟德發展計劃確立；2010 年成立啟德辦事處統籌發展，2013 年郵輪碼頭、2025 年體育園相繼啟用。" }
 ];
 
-/* 地點（標記）。type: event 事件 | landmark 地標 | photo 照片 | video 影像 | audio 聲音 | memory 記憶 */
 const POIS = [
   {
     id: "kaitakbund", era: "e1924", pos: [22.3250, 114.2075],
     name: "啟德濱：填海起家的機場",
     sub: "Kai Tak Bund · 1912–1924",
     types: ["landmark"],
-    /* 1912 年合組、約 1916 年全面動工、1924 年清盤及土地收回：見 Gwulo 引《The life and times of Sir Kai Ho Kai》。
-       待核：啟晴邨、德朗邨是否為啟德濱填海地核心（兩邨位於前北停機坪） */
     desc: "「啟德」之名源自何啟與區德於 1912 年合組的「啟德營業有限公司」。公司在九龍灣北岸填海造地，約 1916 年起全面動工，計劃發展「啟德濱」花園城市；計劃未能成功，公司於 1924 年清盤，填海地由政府收回，其後闢作飛行場地，啟德機場的故事由此開始。今天的啟晴邨、德朗邨一帶，正是當年啟德濱填海地的核心。",
     sources: [
       { label: "Gwulo：啟德濱（引何啟傳記：1912 年合組，1924 年清盤，土地由政府收回）", url: "https://gwulo.com/node/40653" },
@@ -81,7 +59,6 @@ const POIS = [
     sub: "RAF Kai Tak · 1927–1978",
     types: ["landmark", "photo"],
     desc: "1927 年 3 月 19 日皇家空軍啟德基地正式成立，啟德成為軍民合用機場，直至 1978 年 3 月 31 日皇家空軍完全撤離。位於觀塘道 51 號的前皇家空軍軍官會所（1934 年落成）至今尚存，是啟德軍事年代少數留存的建築。1951 年從軍官會所遠眺，跑道、停機坪與九龍灣一覽無遺。",
-    /* 待核：「一級歷史建築」評級；標記座標尚未按觀塘道 51 號精確定位 */
     media: [
       { kind: "img", src: "assets/img/raf_mess_1935.jpg", cap: "皇家空軍軍官會所，1935 年", credit: "Gwulo.com（Former RAF Officers' Mess, Kai Tak）", creditUrl: "https://gwulo.com/node/7612" },
       { kind: "img", src: "assets/img/raf_view_1951.jpg", cap: "1951 年從軍官會所遠眺啟德機場", credit: "Gwulo.com", creditUrl: "https://gwulo.com/node/7612/photos" },
@@ -107,8 +84,6 @@ const POIS = [
     name: "宋皇台遷拆（1943）",
     sub: "Sung Wong Toi relocation",
     types: ["landmark", "event"],
-    /* 待核：「將巨石鑿起遷往他處」「戰後移回現址」「兩次遷移」——宋王臺花園並非原址，戰後是把殘石移到花園，
-       不是「移回」；建議對照 Hon & Chan (2023) 及古物古蹟辦事處資料改寫 */
     desc: "1943 年 1 月 9 日，日治政府為擴建啟德機場，舉行宋王台遷拆祭典，將南宋遺址巨石鑿起遷往他處；戰後 1950 年代宋王台巨石被移回現址，建宋皇台花園。一塊石頭的兩次遷移，見證了啟德擴張與九龍城社區的角力——這是啟德發展史上最早的一宗「保育 vs 機場」事件。",
     sources: [
       { label: "《啟德機場大事年表》1943 年條", url: "" }
@@ -139,12 +114,10 @@ const POIS = [
     name: "13/31 跑道（1958 新跑道啟用）",
     sub: "Runway 13/31 · 2,540 m → 3,390 m",
     types: ["landmark", "photo", "video", "audio"],
-    /* 待核：「彗星」5 型——5 型從未投入服務，1958 年英國海外航空使用的應是 4 型，請對照課程年表原文 */
     desc: "1950 年 10 月舊 13/31 跑道延長至橫越清水灣道；1954 年港府展開大規模填海擴建，1958 年 9 月 12 日新 13/31 跑道正式開幕，同日英國海外航空「彗星」5 型噴射客機抵港。1974 年跑道延長部分與儀器導進系統啟用，1979–80 年再延長至 3,390 米。這條伸入九龍灣的跑道，日後成為全球最著名的「城市機場跑道」。在側欄「歷史地圖」選擇 1963 年九龍半島地圖，可見新跑道西北段與客運大樓一帶。",
     media: [
       { kind: "img", src: "assets/img/kaitak_1951.jpg", cap: "1951 年的啟德機場（新跑道建成前），遠處為獅子山", credit: "Eternal1966（Flickr，經 Gwulo.com）", creditUrl: "https://gwulo.com/media/23334" },
       { kind: "img", src: "assets/img/opening_1958.jpg", cap: "1958 年 9 月 12 日新跑道開幕", credit: "moddsey（Gwulo.com）", creditUrl: "https://gwulo.com/media/33972" },
-      /* 待核：此圖不在原標註的 Gwulo node/62621 頁面上，攝影者與出處待補 */
       { kind: "img", src: "assets/img/runway31.jpg", cap: "31 跑道望向獅子山方向", credit: "出處待補" },
       { kind: "yt", id: "umK2OdC8wso", cap: "1989 年啟德機場實錄：降落大轉彎（波音 747 / DC-10）", credit: "YouTube：Nao Nakagawa《[Old-Film] Hong kong-Kaitak 1989》", creditUrl: "https://www.youtube.com/watch?v=umK2OdC8wso" }
     ],
@@ -197,8 +170,6 @@ const POIS = [
     name: "格仔山：啟德式降落的起點",
     sub: "Checkerboard Hill · IGS Runway 13",
     types: ["landmark", "photo", "video", "memory", "audio"],
-    /* 待核：「後來被塗灰」與 checkerboard_ocs.jpg 所見的鮮明格仔不符；「家妍山」稱呼（劇中主角名為文家宜），
-       宜對照星島 2024-05-26 報道 */
     desc: "飛機降落 13 跑道時，需沿儀器導航（IGS）航道自西向東低空飛越九龍西部市區，目視格仔山上橙白相間的大方格後，右轉約 47 度、越過九龍城對準跑道——這就是著名的「啟德大轉彎」（Kai Tak Turn / Hong Kong Curve）。格仔山因此成為全球航空迷的朝聖地。機師稱之為「啟德心臟病發」（Kai Tak Heart Attack）。格仔山上的格仔圖案後來被塗灰；2023 年底電視劇《新聞女王》播出後，格仔山再度走紅，被市民稱為「家妍山」。",
     media: [
       { kind: "img", src: "assets/img/checkerboard_ocs.jpg", cap: "格仔山上的格仔圖案", credit: "Our China Story 當代中國", creditUrl: "https://www.ourchinastory.com/zh/8200/" },
@@ -236,8 +207,6 @@ const POIS = [
     name: "和諧式訪港（1976）",
     sub: "Concorde at Kai Tak",
     types: ["video", "event"],
-    /* 待核：「多次出現在維港上空」「被譽為『啟德最美的景觀之一』」暫無出處；和諧式從未開辦來港定期航班。
-       1976 年法航 F-BTSC 首次訪港，Gwulo 有照片佐證 */
     desc: "1976 年 11 月 5 日，法航「和諧式」（Concorde）超音速客機首次到港。退役前的啟德歲月裡，和諧式的優雅身影曾多次出現在維多利亞港上空，被譽為「啟德最美的景觀之一」。",
     media: [
       { kind: "yt", id: "fXEIs3gdW_A", cap: "法航和諧式在啟德機場降落（原聲）", credit: "YouTube：Just Planes《Awesome Air France CONCORDE at KAI TAK!》", creditUrl: "https://www.youtube.com/watch?v=fXEIs3gdW_A" }
@@ -327,8 +296,6 @@ const POIS = [
     name: "1998 年 7 月 5–6 日 · 最後一日",
     sub: "The last day of Kai Tak",
     types: ["event", "photo", "memory", "audio"],
-    /* 待核：KA841 出發地（原文作重慶，另有說法為成都）；金·沙曼那段引文是否為機長本人原話、
-       他是否為最後一班 CX251 的機長，宜對照 BBC 中文原文 */
     desc: "1998 年 7 月 5 日是啟德最後一天運作：最後一班抵港航班為港龍 KA841（重慶抵港，晚上 11 時 38 分降落）；最後一班離港商業航班為國泰 CX251（7 月 6 日凌晨 0 時 02 分起飛往倫敦希思羅）。空載飛機轉場後，民航處處長施高理在控制塔以 “Goodbye Kai Tak, and thank you!” 告別，按鈕熄滅跑道全部燈光——服務香港 73 年的城市機場謝幕。其後啟德二號貨站一度重開，疏導新機場搬遷混亂。",
     media: [
       { kind: "img", src: "assets/img/closure_kt1.jpg", cap: "1998 年 7 月 22 日，站在停用兩周的跑道上望向東南（鯉魚門方向）", credit: "moddsey 攝（Gwulo.com）", creditUrl: "https://gwulo.com/node/6366" },
@@ -348,11 +315,83 @@ const POIS = [
     sources: [
       { label: "《啟德機場大事年表》1998 年條", url: "" },
       { label: "BBC 中文：啟德機場關閉25周年，2023-07-05", url: "https://www.bbc.com/zhongwen/simp/chinese-news-66108373" },
-      { label: "Gwulo：Closure of Kai Tak Airport", url: "https://gwulo.com/node/6366" }
+      { label: "Gwulo：Closure of Kai Tak Airport", url: "https://gwulo.com/node/6366" },
+      { label: "政府檔案處：1998 年啟德機場照片集", url: "https://www.grs.gov.hk/ws/erp/album/kta.html" },
+      { label: "Daryl Chapman：1998 年關閉前航拍與回憶（Flickr）", url: "https://www.flickr.com/photos/darylchapman/3885972320" }
     ]
   },
   {
-    id: "development", era: "e1998", pos: [22.3185, 114.2055],
+    id: "northapron", era: "e1998", pos: [22.3310, 114.2035],
+    name: "北停機坪地盤整理及土地淨化（1998–2002）",
+    sub: "North Apron decommissioning",
+    types: ["event"],
+    desc: "關閉前的啟德是一套相互連接的航空空間：北停機坪停放和維修飛機，客運大樓與多層停車樓連接旅客和城市交通，南停機坪一帶保留維修和加油設施，13/31 跑道伸向九龍灣。機場關閉改變了這些地方的功能，卻沒有立即抹去它們的形狀。北停機坪最先進入整備：北停機坪的地盤整理及土地淨化工程於 1998 年 10 月展開，並於 2002 年 4 月完成。這指的是前期的地盤整理和土地淨化，並非北停機坪其後的全部發展工程。旁邊的舊客運大樓和停車樓仍被佔用（租戶要到 2003 年底才遷出），施工無法進入，所以比周邊更晚退場。對附近居民來說，機場不是在某一天離開，而是在幾年間逐塊退場。",
+    sources: [
+      { label: "立法會工務小組委員會文件 PWSC(2003-04)66：北停機坪基建、客運大樓及停車樓拆卸", url: "https://www.legco.gov.hk/yr03-04/english/fc/pwsc/papers/p03-66e.pdf" },
+      { label: "立法會工務小組委員會文件（1998 年 9 月；2012–13 年度第 27 段；2019–20 年度）：北停機坪地盤整理及土地淨化工程 1998 年 10 月展開、2002 年 4 月完成", url: "" },
+      { label: "立法會規劃地政及工程事務委員會文件 CB(1)813/03-04(07)：客運大樓及停車樓租戶遷出安排", url: "https://www.legco.gov.hk/yr03-04/english/panels/plw/papers/plw0127cb1-813-7e.pdf" },
+      { label: "1997 年啟德機場運行布局圖（AirportHistory.org）", url: "https://www.airporthistory.org/uploads/1/2/1/4/121407428/kai-tak-airport-part_orig.png" }
+    ]
+  },
+  {
+    id: "terminaldemolition", era: "e1998", pos: [22.3292, 114.1990],
+    name: "舊客運大樓與停車樓拆卸（2004–2006）",
+    sub: "Demolition of the passenger terminal",
+    types: ["event"],
+    desc: "租戶在 2003 年底遷出後，客運大樓、多層停車樓及相關構築物的拆卸工程於 2004 年 4 月展開，拆卸原定於 2006 年年中完成，整份工程合約則於同年 9 月大致完成。大樓拆卸之後，還要淨化客運大樓及停車場大樓下方的土地，並處理排水設施。建築從地面消失後，舊址仍留下大片硬地、工程圍欄和尚未處理的設施。2004 年和 2005 年的現場照片與航拍記錄了這個階段：繁忙的航空建築陸續消失，停機坪一帶出現沙料堆放、工程活動和其他臨時設施——舊機場不再承擔航空運輸，卻也還沒有變成新的城區。",
+    sources: [
+      { label: "立法會工務小組委員會文件 PWSC(2003-04)66（2004 年 2 月 18 日審議）：2004 年 4 月展開，拆卸原定 2006 年年中完成，整份合約計劃 2006 年 9 月完成", url: "https://www.legco.gov.hk/yr03-04/english/fc/pwsc/papers/p03-66e.pdf" },
+      { label: "立法會工務小組委員會 2010–11 年度文件：工程於 2006 年 9 月大致完成", url: "" },
+      { label: "2004 年 5 月 30 日舊址照片與現場圖說（Gilbert Choy，JetPhotos）", url: "https://www.jetphotos.com/photo/294663" },
+      { label: "2005 年 8 月 31 日舊址航拍與圖說（Colin Parker，JetPhotos）", url: "https://www.jetphotos.com/photo/556857" }
+    ]
+  },
+  {
+    id: "landuse2005", era: "e1998", pos: [22.3160, 114.2030],
+    name: "2005：六成土地臨時出租或撥用",
+    sub: "Temporary land uses, 2005",
+    types: ["event", "photo"],
+    desc: "2005 年 11 月，政府向共建維港委員會提交的文件附有《Existing Land Uses in Kai Tak》地圖。文件指出，約 220 公頃的舊址中約六成已作臨時用途：約 45.5 公頃以短期租約出租，用作高爾夫球中心、非牟利飛行訓練學校、收費公眾停車場、露天貯物和巴士停泊；約 82.9 公頃臨時撥給政府部門，包括清拆舊客運大樓和停車樓的工地、承建商工地、堆料和貯存等。這些用途並不平均：靠近九龍城、能直接連接道路的外圍土地，較容易成為停車場、貯存地或部門臨時用地；機場內部遠離公共道路，缺少公共交通和安全的車輛及行人通道，約 60.1 公頃破損混凝土地面還需重鋪和加設排水。城市因此先從容易到達的邊緣進入，再逐漸接觸舊機場內部。",
+    media: [
+      { kind: "img", src: "assets/img/landuse_2005_annexF.jpg", cap: "Existing Land Uses in Kai Tak（2005 年 10 月 20 日）。紅／粉紅為短期租約，橙為臨時撥給土木工程拓展署，藍為臨時撥給其他部門，淺紫／淡灰為擬議臨時撥地；顏色表示租用或撥地性質，不一定等於實際用途。", credit: "土木工程拓展署（共建維港委員會文件第 29/2005 號附件 F）", creditUrl: "https://www.harbourfront.org.hk/eng/content_page/doc/agenda051124/agenda6.pdf#page=10" }
+    ],
+    sources: [
+      { label: "共建維港委員會文件第 29/2005 號：Temporary Harbour-front Land Use（2005-11-17；第 14–17 段、附件 F）", url: "https://www.harbourfront.org.hk/eng/content_page/doc/agenda051124/agenda6.pdf" }
+    ]
+  },
+  {
+    id: "eia2007", era: "e1998", pos: [22.3190, 114.2010],
+    name: "2007：舊跑道上的臨時城市",
+    sub: "Temporary uses after closure, 2007",
+    types: ["event", "photo"],
+    desc: "2007 年，拆除舊機場餘下設施（北停機坪以外）的環境影響評估，把舊跑道和南停機坪分成多個編號地塊，標示關閉後的土地用途：巴士車廠、停車場、高爾夫練習場、為彩雲及佐敦谷發展而設的堆料場，以及各類工程用地。有些用途已經終止，有些仍在運作；南停機坪地下的燃油栓系統、舊油缸和輸油管則仍待拆除。機場的舊設施、臨時用途和未來工程，在同一片土地上重疊。2008 年起南停機坪的清拆除污，見「啟德重生」年代的大綱圖條目。",
+    media: [
+      { kind: "img", src: "assets/img/eia_2007_dwg32.jpg", cap: "Drawing 3.2：啟德機場關閉後，項目範圍內（舊跑道及南停機坪）的現有土地用途。圖中部分編號用途已經終止，閱讀時請對照圖例。", credit: "環境影響評估報告圖紙（環保署環評資料庫）", creditUrl: "https://www.epd.gov.hk/eia/files/applications/en/pp_160/eia_1668/progress/action_2865/Drawings/DWG%203.2.files/image002.jpg" }
+    ],
+    sources: [
+      { label: "環保署：Decommissioning of the Former Kai Tak Airport other than the North Apron（AEIAR-114/2007）", url: "https://www.epd.gov.hk/eia/english/alpha/aspd_505.html" },
+      { label: "環評報告第 2 章項目描述（關閉後的臨時用途、南停機坪燃油栓系統）", url: "https://epd.gov.hk/eia/register/report/eiareport/eia_1392007/Formal%20Submission%20html/EIA/Text/S2%20Project%20Description.htm" },
+      { label: "環評報告及圖紙目錄", url: "https://www.epd.gov.hk/eia/files/applications/en/pp_160/eia_1668/progress/action_2865/TOC.htm" }
+    ]
+  },
+  {
+    id: "fencegaps", era: "e1998", pos: [22.3093, 114.2094],
+    name: "圍欄內外：舊跑道上的日常（2006–2007）",
+    sub: "Life inside the fence",
+    types: ["memory"],
+    desc: "政府地圖記錄的是獲撥用或獲租用的土地，使用者的記憶則讓圍欄內的生活變得可見。網誌作者 Stephen C Chan 在 2007 年 4 月 2 日發表〈Old KaiTak Airport Today〉，記錄他在 2006 年底至 2007 年初進入舊機場的見聞：場內有高爾夫、停車、儲沙和混凝土等用途，也有人騎自行車、放模型飛機，有兒童在打板球，還有人在舊址拾取金屬；有人從圍欄缺口進入，缺口後來又被修補；地面仍保留機場的引導標線。同年 12 月，Mark Simons 在舊跑道 A8 出口拍照時寫道，跑道正由政府使用，另有發展項目在籌劃，其中之一是改建為郵輪碼頭。停車、巴士車廠、堆料和工程透過租約或政府撥地進入，騎車、模型飛機和板球則從圍欄缺口進入——兩種使用共同構成過渡期的日常，也讓「誰能夠進入」成為這段記憶的重要部分。（以上是個人親歷記錄，不表示舊機場各區都對外開放。）",
+    quotes: [
+      { text: "Some people ride bicycles there. Others fly model airplanes.（有人在那裏騎單車，也有人放模型飛機。）", who: "Stephen C Chan，〈Old KaiTak Airport Today〉", src: "網誌 Musings on Life in Hong Kong，2007-04-02" },
+      { text: "The city line literally started at the beginning of the runway.（城市的邊線，真的就從跑道起點開始。）", who: "Mark Simons，舊跑道 A8 出口照片說明", src: "Flickr，2007 年 12 月" }
+    ],
+    sources: [
+      { label: "Stephen C Chan：Old KaiTak Airport Today（2007-04-02，含現場照片）", url: "https://stephencfchan.blogspot.com/2007/04/" },
+      { label: "2007 年 6 月 5 日舊址航拍（JetPhotos）", url: "https://www.jetphotos.com/photo/6000626" },
+      { label: "Mark Simons：2007 年 12 月舊跑道 A8 出口照片（Flickr）", url: "https://www.flickr.com/photos/msimons/2085342251/" }
+    ]
+  },
+  {
+    id: "development", era: "e2007", pos: [22.3185, 114.2055],
     name: "《啟德分區計劃大綱圖》與土地除污（2007–2008）",
     sub: "Kai Tak OZP & decontamination",
     types: ["event", "memory"],
@@ -363,11 +402,10 @@ const POIS = [
     ]
   },
   {
-    id: "cruise", era: "e1998", pos: [22.3066, 114.2128],
+    id: "cruise", era: "e2007", pos: [22.3066, 114.2128],
     name: "啟德郵輪碼頭（2013）",
     sub: "Kai Tak Cruise Terminal",
     types: ["landmark", "photo"],
-    /* 待核：「碼頭頂層的啟德跑道公園」——跑道公園可能是碼頭旁另一個公園，碼頭頂層的花園另有名稱 */
     desc: "2013 年 6 月，建於前跑道末端的啟德郵輪碼頭啟用，可停泊世界級郵輪。碼頭頂層的啟德跑道公園保留了不少機場記憶：航空主題展品、觀景平台，以及那道伸向維港的舊跑道中軸線。站在碼頭一帶，腳下正是當年跑道東南端（13 跑道的盡頭、31 跑道的起點）伸入海港之處。",
     media: [
       { kind: "img", src: "assets/img/memory_exhibition_1.jpg", cap: "Mikiki 商場「啟德機場相片展」展品（2019）", credit: "Gwulo 用戶 gary.c 攝", creditUrl: "https://gwulo.com/node/51672" },
@@ -379,11 +417,10 @@ const POIS = [
     ]
   },
   {
-    id: "sportspark", era: "e1998", pos: [22.3236, 114.1978],
+    id: "sportspark", era: "e2007", pos: [22.3236, 114.1978],
     name: "啟德體育園與跑道末端（2020–2025）",
     sub: "Kai Tak Sports Park",
     types: ["landmark", "memory", "event"],
-    /* 待核：2025 年 3 月 30 日國泰 A350 低空飛行的日期、高度、航線，以及「啟德機場百周年」的說法 */
     desc: "2020 年，當局就跑道末端發展展開規劃研究，諮詢居民對土地用途的意見（見 2023–24 年報道）。2025 年 3 月，啟德體育園正式開幕；同月 30 日，國泰以 A350 客機在 1,000 呎低空重飛經典航線，由北角、灣仔飛越維港，到啟德體育園上空盤旋——紀念啟德機場百周年。天上的轟鳴，回來了。",
     sources: [
       { label: "大公文匯：啟德發展報道，2023-10-28", url: "https://www.tkww.hk/a/202310/28/AP653c52f7e4b05c8858008171.html" },
@@ -393,7 +430,6 @@ const POIS = [
   }
 ];
 
-/* 大事年表（選錄，依《啟德機場大事年表》及課程材料） */
 const TIMELINE = [
   { y: "1924", d: "",      t: "啟德營業有限公司清盤，填海地由政府收回", poi: "kaitakbund" },
   { y: "1924", d: "05-31", t: "美國飛行家亞拔首次使用啟德濱空地試飛", poi: "firstflight" },
@@ -417,6 +453,14 @@ const TIMELINE = [
   { y: "1989", d: "10-11", t: "港府宣布於赤鱲角興建新機場", poi: "replacement" },
   { y: "1993", d: "11-04", t: "華航 747-400 暴風雨中降落衝出跑道滑入九龍灣", poi: "ci605" },
   { y: "1998", d: "07-05", t: "啟德最後一天運作；翌日凌晨 CX251 離港後跑道燈熄滅", poi: "closure" },
+  { y: "1998", d: "10",    t: "北停機坪地盤整理及土地淨化工程展開", poi: "northapron" },
+  { y: "2002", d: "04",    t: "北停機坪地盤整理及土地淨化工程完成", poi: "northapron" },
+  { y: "2003", d: "12-31", t: "舊客運大樓及停車樓租戶遷出限期", poi: "terminaldemolition" },
+  { y: "2004", d: "04",    t: "舊客運大樓、停車樓及相關構築物開始拆卸", poi: "terminaldemolition" },
+  { y: "2005", d: "11",    t: "政府文件：舊址約六成土地已短期出租或臨時撥用", poi: "landuse2005" },
+  { y: "2006", d: "09",    t: "客運大樓拆卸工程合約大致完成", poi: "terminaldemolition" },
+  { y: "2007", d: "04-02", t: "Stephen C Chan 發表舊機場現場日記〈Old KaiTak Airport Today〉", poi: "fencegaps" },
+  { y: "2007", d: "",      t: "環評報告記錄舊跑道及南停機坪的臨時用途，燃油設施仍待拆除", poi: "eia2007" },
   { y: "2007", d: "",      t: "年底《啟德分區計劃大綱圖》獲核准，啟德發展計劃啟動", poi: "development" },
   { y: "2008", d: "",      t: "南停機坪清拆及除污工程展開（立法會撥款）", poi: "development" },
   { y: "2010", d: "03-01", t: "土木工程拓展署成立啟德辦事處，統籌啟德發展", poi: "development" },
@@ -427,10 +471,6 @@ const TIMELINE = [
   { y: "2025", d: "03-30", t: "啟德機場百周年：國泰 A350 低空重飛經典航線", poi: "sportspark" }
 ];
 
-/* 機場痕跡示意圖層（geometry 為約略位置，供教學演示）
-   跑道兩端按 1996 年測量圖量度；格仔山位置取自 OpenStreetMap。
-   進場航線：沿 IGS 導航航道（約 088°）自西向東飛向格仔山，於格仔山前右轉約 47° 對準 13 跑道，
-   轉彎半徑以 1.4 公里示意。 */
 const FEATURES = {
   runway: {
     name: "13/31 跑道（示意）", note: "3,390 m × 60 m，1958/1974/1979 三次擴建",

@@ -1,8 +1,3 @@
-/* ============================================================
-   啟德記憶 Kai Tak Memory — 主程式
-   Leaflet 地圖 · 歷史圖層 · 年代時光機 · 記憶抽屜 · 居民投稿
-   v4：歷史地圖選單、地圖出處欄、搜尋涵蓋所有年代等；v4.1：刪除「關於本站 · 貢獻記憶」；v4.2：重訂年代劃分，年代按鈕改由 data.js 生成。見 CHANGELOG.md
-   ============================================================ */
 "use strict";
 
 const $ = (s) => document.querySelector(s);
@@ -10,7 +5,6 @@ const $$ = (s) => Array.from(document.querySelectorAll(s));
 const escHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-/* ---------- 地圖初始化 ---------- */
 const AIRPORT_CENTER = [22.3185, 114.2065];
 const map = L.map("map", {
   center: AIRPORT_CENTER,
@@ -21,9 +15,6 @@ const map = L.map("map", {
   attributionControl: false
 });
 L.control.zoom({ position: "bottomright" }).addTo(map);
-/* 地圖來源：收在左下角的「ⓘ」按鈕裏，點開才顯示。
-   Esri 底圖條款要求在地圖上署名，所以保留出處欄，只是預設收起。
-   先加按鈕、再加出處欄：Leaflet 底部角落的控制項後加的排在上方，所以出處會在按鈕上方彈出。 */
 const AttrToggle = L.Control.extend({
   options: { position: "bottomleft" },
   onAdd() {
@@ -33,7 +24,7 @@ const AttrToggle = L.Control.extend({
     btn.title = "地圖來源";
     btn.setAttribute("aria-label", "顯示地圖來源");
     btn.setAttribute("aria-expanded", "false");
-    L.DomEvent.disableClickPropagation(btn);   // 點按鈕不會穿透到地圖
+    L.DomEvent.disableClickPropagation(btn);
     L.DomEvent.on(btn, "click", () => {
       const open = map.getContainer().classList.toggle("attr-open");
       btn.setAttribute("aria-expanded", open ? "true" : "false");
@@ -48,7 +39,6 @@ L.control.attribution({
   prefix: '<a href="https://leafletjs.com" target="_blank" rel="noopener noreferrer">Leaflet</a>'
 }).addTo(map);
 
-/* 現代底圖 */
 const BASES = {
   imagery: L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -63,18 +53,15 @@ const BASES = {
 BASES.imagery.addTo(map);
 let currentBase = "imagery";
 
-/* ---------- 歷史地圖圖層（本地瓦片） ---------- */
-/* 缺失瓦片的替代圖：真正透明的 1×1 PNG（舊版用的是半透明藍色像素，缺圖處會出現藍色方塊） */
 const TRANSPARENT_PX =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==";
-/* "1963.3" 之類的鍵不是整數，Object.keys 不會按年份排列，所以手動排序 */
 const HIST_IDS = Object.keys(HISTORICAL_MAPS).sort((a, b) => parseFloat(a) - parseFloat(b));
 const histLayers = {};
 HIST_IDS.forEach((id) => {
   const cfg = HISTORICAL_MAPS[id];
   histLayers[id] = L.tileLayer(`${TILE_DIR}${id}/{z}/{x}/{y}.png`, {
-    bounds: L.latLngBounds(cfg.bounds),   // 只請求確實存在的瓦片
-    minNativeZoom: 12,                    // 縮小到 11 級時沿用 12 級瓦片，不會整層消失
+    bounds: L.latLngBounds(cfg.bounds),
+    minNativeZoom: 12,
     maxNativeZoom: Math.min(cfg.maxZoom, 17),
     maxZoom: 18,
     opacity: 0.85,
@@ -106,32 +93,26 @@ function buildHistSelect() {
   sel.addEventListener("change", () => {
     setHistoricalLayer(sel.value);
     if (!activeHistId) return;
-    // 圖幅不覆蓋目前視野中心時（例如 1963 航空照片），飛到它的範圍
     const b = L.latLngBounds(HISTORICAL_MAPS[activeHistId].bounds);
     if (!b.contains(map.getCenter())) map.flyToBounds(b, { duration: 1.1 });
   });
 }
 
-/* ---------- 機場痕跡（示意） ---------- */
 const traceGroup = L.layerGroup().addTo(map);
 function buildTraces() {
   traceGroup.clearLayers();
   const rw = FEATURES.runway, ap = FEATURES.approach13, cb = FEATURES.checkerboard;
-  // 跑道
   L.polyline(rw.line, { color: "#c8452c", weight: 5, opacity: 0.9 }).addTo(traceGroup)
     .bindTooltip(rw.name, { permanent: true, direction: "center", className: "runway-label" });
-  // 停機坪範圍
   L.rectangle([[22.3240, 114.1985], [22.3295, 114.2075]], {
     color: "#c8452c", weight: 2, dashArray: "6 4", fillOpacity: 0.06
   }).addTo(traceGroup).bindTooltip("客運大樓及停機坪範圍（示意）", { sticky: true });
-  // 13 跑道進場航線：自西向東，格仔山前右轉
   L.polyline(ap.path, { color: "#d9a441", weight: 3, dashArray: "2 10", opacity: 0.95, className: "approach-line" })
     .addTo(traceGroup).bindTooltip(`${ap.name}：${ap.note}`, { sticky: true });
   L.circleMarker(cb.pos, { radius: 7, color: "#c8452c", fillColor: "#c8452c", fillOpacity: 0.9, weight: 2 })
     .addTo(traceGroup).bindTooltip(cb.name, { permanent: true, direction: "top", className: "cb-label" });
 }
 
-/* ---------- 標記 ---------- */
 const TYPE_META = {
   event:    { label: "事件",   glyph: "◆", color: "#1b2a3a" },
   landmark: { label: "地標",   glyph: "▲", color: "#0e5f6b" },
@@ -152,7 +133,7 @@ function poiIcon(poi) {
   });
 }
 
-const markers = {}; // id -> marker
+const markers = {};
 function buildMarkers() {
   POIS.forEach((poi) => {
     const m = L.marker(poi.pos, { icon: poiIcon(poi), riseOnHover: true });
@@ -163,12 +144,10 @@ function buildMarkers() {
   });
 }
 
-/* ---------- 年代時光機 ---------- */
 let activeEra = null;
 const isNarrow = () => window.matchMedia("(max-width: 860px)").matches;
 const eraRange = (e) => (e.end ? `${e.start}–${e.end}` : `${e.start} 至今`);
 
-/* 年代按鈕與時間軸刻度都由 ERAS 生成，改 data.js 一處即可 */
 function buildEraControls() {
   $("#eraGrid").innerHTML = ERAS.map((e) =>
     `<button class="era-btn" data-era="${e.id}" aria-pressed="false"><b>${e.label}</b><small>${eraRange(e)}</small></button>`).join("");
@@ -176,7 +155,6 @@ function buildEraControls() {
     `<span class="seg" data-era="${e.id}" title="${escHtml(e.label + " " + eraRange(e))}">${e.start}${e.end ? "" : "→"}</span>`).join(""));
 }
 
-/* 切換年代時，把該年代所有地點收進畫面（不同螢幕尺寸都適用）；沒有地點時用後備視角 */
 function flyToEra(era) {
   const pts = POIS.filter((p) => p.era === era.id).map((p) => p.pos);
   if (pts.length > 1) map.flyToBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 15, duration: 1.4 });
@@ -202,13 +180,11 @@ function setEra(eraId, fly = true) {
   $("#tlCursor").style.left = ((idx + 0.5) / ERAS.length) * 100 + "%";
 }
 
-/* 年份 → 所屬年代（年表中沒有對應地點的事件用）。分界年份歸入後一個年代，因為分界事件是新年代的開端 */
 function eraForYear(y) {
   const era = ERAS.filter((e) => e.start <= y).pop();
   return era ? era.id : null;
 }
 
-/* ---------- 篩選（年代 × 類型 × 關鍵字） ---------- */
 const activeTypes = new Set();
 const POI_TEXT = Object.fromEntries(POIS.map((p) => [p.id, [
   p.name, p.sub, p.desc,
@@ -219,7 +195,6 @@ const POI_TEXT = Object.fromEntries(POIS.map((p) => [p.id, [
 const currentKeyword = () => $("#search").value.trim().toLowerCase();
 
 function poiMatches(poi, kw) {
-  // 有關鍵字時搜尋所有年代；沒有關鍵字時只列出目前年代
   const inEra = kw ? true : (!activeEra || poi.era === activeEra);
   const inType = activeTypes.size === 0 || poi.types.some((t) => activeTypes.has(t));
   const inKw = !kw || POI_TEXT[poi.id].includes(kw);
@@ -254,12 +229,11 @@ function renderPoiList() {
     : `<p class="empty">${kw ? "找不到相關地點，可以換個關鍵字試試。" : "此篩選下暫無地點。試試切換年代或類型。"}</p>`);
   box.querySelectorAll(".poi-item").forEach((b) =>
     b.addEventListener("click", () => {
-      if (isNarrow()) setSidebarFolded(true);   // 手機上收起側欄，讓出地圖
+      if (isNarrow()) setSidebarFolded(true);
       openPoi(b.dataset.poi);
     }));
 }
 
-/* 打開地點：如屬其他年代（搜尋結果），先切換年代，讓歷史地圖與地點對應 */
 function openPoi(id, { fly = true } = {}) {
   const poi = POIS.find((p) => p.id === id);
   if (!poi) return;
@@ -268,7 +242,6 @@ function openPoi(id, { fly = true } = {}) {
   openDrawer(id);
 }
 
-/* ---------- 詳情抽屜 ---------- */
 function creditHtml(med, fallbackUrl) {
   const url = med.creditUrl || fallbackUrl;
   const text = med.credit || (url ? "來源" : "");
@@ -320,7 +293,6 @@ function openDrawer(poiId) {
     </div>`;
   el.classList.add("open");
   $("#drawerClose").addEventListener("click", closeDrawer);
-  // 高亮對應標記
   Object.values(markers).forEach((m) => m.getElement()?.classList?.remove("pulse"));
   markers[poi.id]?.getElement()?.classList?.add("pulse");
 }
@@ -328,11 +300,10 @@ function openDrawer(poiId) {
 function closeDrawer() {
   const el = $("#drawer");
   el.classList.remove("open");
-  el.innerHTML = ""; // 清空內容，確保影片隨關閉停止播放
+  el.innerHTML = "";
   Object.values(markers).forEach((m) => m.getElement()?.classList?.remove("pulse"));
 }
 
-/* ---------- 時間軸 ---------- */
 function buildTimeline() {
   const strip = $("#timeline");
   strip.innerHTML = TIMELINE.map((t, i) => `
@@ -345,12 +316,10 @@ function buildTimeline() {
       const t = TIMELINE[parseInt(b.dataset.i, 10)];
       const poi = t.poi ? POIS.find((p) => p.id === t.poi) : null;
       if (poi) {
-        // 切到該事件年代，再飛去
         setEra(poi.era, false);
         map.flyTo(poi.pos, Math.max(map.getZoom(), 15), { duration: 1.2 });
         setTimeout(() => openDrawer(poi.id), 900);
       } else {
-        // 無地點事件：切到該年份所屬年代，再對焦機場中央
         const eraId = eraForYear(parseInt(t.y, 10));
         if (eraId) setEra(eraId, false);
         closeDrawer();
@@ -361,18 +330,15 @@ function buildTimeline() {
   );
 }
 
-/* ---------- UI 事件 ---------- */
 function setSidebarFolded(folded) {
   $("#sidebar").classList.toggle("fold", folded);
   const btn = $("#sidebarToggle");
   btn.textContent = folded ? "»" : "«";
   btn.setAttribute("aria-label", folded ? "展開側欄" : "收起側欄");
-  // 側欄收起/展開後地圖容器尺寸改變，通知 Leaflet 重算
   setTimeout(() => map.invalidateSize(), 300);
 }
 
 function bindUI() {
-  // 切換年代時關閉上一個年代的詳情；手機上收起側欄（底部時間軸仍可切換年代）
   const pickEra = (id) => { closeDrawer(); setEra(id); };
   $$(".era-btn").forEach((b) => b.addEventListener("click", () => {
     if (isNarrow()) setSidebarFolded(true);
@@ -390,7 +356,6 @@ function bindUI() {
       applyFilters();
     });
   });
-  // 搜尋防抖：輸入停止 150ms 後才篩選，避免逐字重建列表
   let searchTimer = null;
   $("#search").addEventListener("input", () => {
     clearTimeout(searchTimer);
@@ -414,7 +379,6 @@ function bindUI() {
   $("#tlToggle").addEventListener("click", () => {
     $("#timelineWrap").classList.toggle("fold");
     $("#tlToggle").textContent = $("#timelineWrap").classList.contains("fold") ? "▲ 年表" : "▼ 收起";
-    // 年表收起後地圖高度改變
     map.invalidateSize();
   });
   document.addEventListener("keydown", (e) => {
@@ -422,17 +386,14 @@ function bindUI() {
   });
 }
 
-/* ---------- 啟動 ---------- */
 buildEraControls();
 buildHistSelect();
 buildTraces();
 buildMarkers();
 buildTimeline();
 bindUI();
-// 窄螢幕預設收起側欄，免得一打開就蓋住地圖
 if (window.matchMedia("(max-width: 860px)").matches) setSidebarFolded(true);
 
-/* 深層連結：?era=e1924&poi=checkerboard 直接開啟指定年代/地點 */
 const params = new URLSearchParams(location.search);
 const pEra = params.get("era");
 const pPoi = params.get("poi");
