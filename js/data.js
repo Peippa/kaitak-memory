@@ -398,11 +398,11 @@ const POIS = [
     desc: "2007 年，歷經多年規劃反覆（1990 年代《都會計劃》、2001 年海港規劃爭議），《啟德分區計劃大綱圖》終獲行政長官會同行政會議核准，啟德發展計劃正式啟動。2008 年，立法會工務小組通過撥款，南停機坪展開清拆及除污工程——這片服務了香港大半世紀的機場用地，開始漫長的「消毒」與重生。居民對規劃一直有意見：由「不建摩天輪」到跑道末端用途，社區聲音從未停過。",
     media: [
       { kind: "img", src: "assets/img/ktd_landuse_ozp.jpg", cap: "啟德發展計劃土地用途圖：今天的規劃藍圖，對應 2022 年 10 月核准的《啟德分區計劃大綱圖》（S/K22/8）", credit: "土木工程拓展署啟德辦事處", creditUrl: "https://www.ktd.gov.hk/eng/overview.html" },
-      { kind: "img", src: "assets/img/kaiching_2013.jpg", cap: "啟晴邨（2013 年 9 月攝）：前北停機坪上的第一個新屋邨，同年 7 月開始入伙", credit: "Qwer132477（Wikimedia Commons，CC BY-SA 3.0）", creditUrl: "https://commons.wikimedia.org/wiki/File:Kai_Ching_Estate_2013_09_part6.JPG" }
+      { kind: "img", src: "assets/img/kaiching_2013.jpg", cap: "啟晴邨（2013 年 9 月攝）：前北停機坪上的第一個新屋邨，同年 8 月首批入伙", credit: "Qwer132477（Wikimedia Commons，CC BY-SA 3.0）", creditUrl: "https://commons.wikimedia.org/wiki/File:Kai_Ching_Estate_2013_09_part6.JPG" }
     ],
     sources: [
       { label: "土木工程拓展署啟德辦事處：啟德發展概覽（分區計劃大綱圖沿革）", url: "https://www.ktd.gov.hk/eng/overview.html" },
-      { label: "Task Force on Kai Tak Harbourfront Development：Kai Tak Development Progress Report as of September 2013（啟晴邨 2013 年 7 月開始入伙）", url: "https://www.hfc.org.hk/filemanager/files/TFKT_11_2013.pdf" },
+      { label: "香港房屋委員會《2013/14 年報》（啟晴邨 2013 年 8 月首批入伙）", url: "https://www.housingauthority.gov.hk/mini-site/haar1314/en/common/pdf/HKHA_Annual_Report%202013-2014.pdf" },
       { label: "《啟德資料收集(2007至今)》（課程材料）", url: "" },
       { label: "立法會 CB(1) 文件：啟德南停機坪清拆及除污，2008", url: "https://www.legco.gov.hk/yr07-08/english/panels/plw/papers/dev-sk222-e.pdf" }
     ]
